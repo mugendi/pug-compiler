@@ -1,5 +1,5 @@
 {
-    "name": "pug-compiler",
+    "name": "pug-compile-to-js",
     "version": "0.0.1",
     "main": "index.js",
     "license": "MIT",
