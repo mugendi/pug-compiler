@@ -15,8 +15,8 @@ module.exports = (function(options = {}) {
 
     // make other paths needed
     let templatesFolder = path.join(appRootDir, './src/templates/'),
-        rawFolder = path.resolve(options.dir) || path.join(templatesFolder, './raw'),
-        outputFolder = path.resolve(options.out) || path.join(templatesFolder, 'compiled'),
+        rawFolder = options.dir ? path.resolve(options.dir) : path.join(templatesFolder, './raw'),
+        outputFolder = options.out ? path.resolve(options.out) : path.join(templatesFolder, 'compiled'),
         allPugFilesCollection = {},
         recentlyCompiledFilesArray = [],
         recompileAfter = options.wait || 1000,
