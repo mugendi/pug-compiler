@@ -45,10 +45,6 @@ module.exports = (function(options = {}) {
 
         // Get all pug files...
         get_pug_files();
-
-        // make funcs function 
-        make_funcs_file();
-
         // watch folder
         watch_raw_folder();
 
@@ -210,19 +206,17 @@ module.exports = (function(options = {}) {
             compiled = pug.compileFileClient(filePath, { compileDebug: false }).toString();
 
             // Replace PUG Files
-            let exported = compiled.replace(/([\w\W]+?)(function template\([\w\W]+)/, "$2");
+            // let exported = compiled.replace(/([\w\W]+?)(function template\([\w\W]+)/, "$2");
             // Add import, and export statements 
-            exported = `
-        // Import Needed Pug Files  
-        import {pug_escape ,pug_rethrow, pug_match_html} from './__funcs.js'; \n\n    
-        ${exported}
-        export default template; `;
+            compiled = `
+            ${compiled}
+            export default template; `;
 
             // the Output File
             let outputFile = path.join(outputFolder, fileName.replace('.pug', '.js'));
 
             // console.log(exported);
-            fs.writeFileSync(outputFile, exported);
+            fs.writeFileSync(outputFile, compiled);
 
         } catch (error) {
             console.log(error.message);
@@ -240,24 +234,5 @@ module.exports = (function(options = {}) {
 
     }
 
-
-    function make_funcs_file() {
-        // ensure output directory exists
-        fs.ensureDirSync(outputFolder);
-        // file path
-        let file = path.join(outputFolder, '__funcs.js');
-
-        fs.writeFileSync(file, pug_funcs_code());
-    }
-
-    function pug_funcs_code() {
-        return `
-export let pug_escape = function pug_escape(e){var a=""+e,t=pug_match_html.exec(a);if(!t)return e;var r,c,n,s="";for(r=t.index,c=0;r<a.length;r++){switch(a.charCodeAt(r)){case 34:n="&quot;";break;case 38:n="&amp;";break;case 60:n="&lt;";break;case 62:n="&gt;";break;default:continue}c!==r&&(s+=a.substring(c,r)),c=r+1,s+=n}return c!==r?s+a.substring(c,r):s}
-
-export let pug_match_html=/["&<>]/;
-
-export let pug_rethrow = function pug_rethrow(e,n,r,t){if(!(e instanceof Error))throw e;if(!("undefined"==typeof window&&n||t))throw e.message+=" on line "+r,e;var o,a,i,s;try{t=t||require("fs").readFileSync(n,{encoding:"utf8"}),o=3,a=t.split("\\n"),i=Math.max(r-o,0),s=Math.min(a.length,r+o)}catch(t){return e.message+=" - could not read from "+n+" ("+t.message+")",void pug_rethrow(e,null,r)}o=a.slice(i,s).map(function(e,n){var t=n+i+1;return(t==r?"  > ":"    ")+t+"| "+e}).join("\\n"),e.path=n;try{e.message=(n||"Pug")+":"+r+"\\n"+o+"\\n\\n"+e.message}catch(e){}throw e}
-    `
-    }
 
 })
